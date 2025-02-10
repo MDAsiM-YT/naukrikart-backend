@@ -7,13 +7,23 @@ const jobRoutes = require('./routes/jobRoutes');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
-// Connect to MongoDB (Remove deprecated options)
+// Enable CORS for frontend requests
+app.use(cors({
+  origin: "https://naukrikart-frontend.vercel.app", // Replace with your frontend URL
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true
+}));
+
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+  .catch(err => {
+    console.error('❌ MongoDB Connection Error:', err);
+    process.exit(1); // Stop the server if DB connection fails
+  });
 
+// Routes
 app.use('/api/jobs', jobRoutes);
 
 // Define PORT properly
